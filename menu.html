@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Surprise 💝</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        margin: 0;
+        font-family: 'Nunito', Arial, sans-serif;
+
+        background: linear-gradient(135deg, #f17793, #de2a54);
+
+        min-height: 100vh;
+        overflow: hidden;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+    /* STARS */
+    #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    /* HEARTS */
+    .hearts {
+      position: fixed; inset: 0;
+      overflow: hidden; pointer-events: none; z-index: 1;
+    }
+    .heart {
+      position: absolute; top: -10px;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* HEADER */
+    .header {
+      position: relative; z-index: 10;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      font-size: 26px; font-weight: 800;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(255,150,220,0.8), 0 2px 10px rgba(0,0,0,0.5);
+      letter-spacing: 2px;
+    }
+    .header p {
+      color: white;
+      font-size: 13px; margin-top: 6px;
+    }
+
+    /* CAROUSEL WRAPPER */
+    .carousel-wrap {
+      position: relative; z-index: 10;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .carousel {
+      width: 100%;
+      height: 340px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+    }
+
+    /* CARD */
+    .card {
+      position: absolute;
+      width: 200px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+
+    .card-inner {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      transition: all 0.5s ease;
+    }
+
+    /* CARD TOP — colored band */
+    .card-top {
+      height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-top::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.15);
+    }
+
+    .card-glow {
+      position: absolute;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.25), transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .card-icon {
+      font-size: 64px;
+      position: relative; z-index: 2;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+      transition: transform 0.3s;
+    }
+
+    /* CARD BOTTOM */
+    .card-bottom {
+      background: rgba(10, 5, 30, 0.92);
+      padding: 14px 12px 16px;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .card-title {
+      font-size: 15px; font-weight: 800;
+      color: white;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: rgba(255,200,230,0.7);
+      font-weight: 600;
+    }
+
+    /* CARD STATES */
+    /* CENTER */
+    .card.center {
+      transform: translateX(0) scale(1) translateZ(0);
+      z-index: 5;
+    }
+    .card.center .card-inner {
+      border-color: rgba(255,200,230,0.6);
+      box-shadow:
+        0 0 0 1px rgba(255,150,200,0.3),
+        0 20px 60px rgba(0,0,0,0.6),
+        0 0 40px rgba(255,100,180,0.3);
+    }
+    .card.center .card-icon { transform: scale(1.1); }
+
+    /* LEFT 1 */
+    .card.left1 {
+      transform: translateX(-180px) scale(0.82) translateZ(-100px);
+      z-index: 4;
+      opacity: 0.85;
+    }
+    /* RIGHT 1 */
+    .card.right1 {
+      transform: translateX(180px) scale(0.82) translateZ(-100px);
+      z-index: 4;
+      opacity: 0.85;
+    }
+    /* LEFT 2 */
+    .card.left2 {
+      transform: translateX(-310px) scale(0.65) translateZ(-200px);
+      z-index: 3;
+      opacity: 0.5;
+    }
+    /* RIGHT 2 */
+    .card.right2 {
+      transform: translateX(310px) scale(0.65) translateZ(-200px);
+      z-index: 3;
+      opacity: 0.5;
+    }
+    /* HIDDEN */
+    .card.hidden {
+      transform: translateX(0) scale(0.4);
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ARROW BUTTONS */
+    .arrow {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      z-index: 20;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      background: radial-gradient(circle at 40% 35%, #ffffff, #ffffff);
+      box-shadow:
+        0 0 0 3px rgba(255,255,255,0.2),
+        0 8px 20px rgba(255,79,154,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+      transition: 0.2s;
+      color: #d75d9c;
+    }
+    .arrow:hover { transform: translateY(-50%) scale(1.1); }
+    .arrow:active { transform: translateY(-50%) scale(0.95); }
+    .arrow.left  { left: 80px; }
+    .arrow.right { right: 80px; }
+
+    /* DOTS */
+    .dots {
+      display: flex; gap: 8px;
+      margin-top: 18px; z-index: 10;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      transition: 0.3s;
+      cursor: pointer;
+    }
+    .dot.active {
+      background: #ff6eb4;
+      box-shadow: 0 0 8px rgba(255,110,180,0.8);
+      width: 22px;
+      border-radius: 4px;
+    }
+
+    /* SELECT BUTTON */
+    .select-wrap {
+      z-index: 10; margin-top: 24px;
+    }
+
+    .select-btn {
+      padding: 14px 60px;
+      border: none; border-radius: 8px;
+      font-size: 18px; font-weight: 800;
+      letter-spacing: 2px;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+      transition: 0.2s;
+      position: relative;
+      overflow: hidden;
+
+      background: radial-gradient(circle at 40% 35%, #de2a54, #de2a54);
+      color: white;
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,0.2),
+        0 -4px 0 rgba(0,0,0,0.3) inset,
+        0 8px 20px rgba(255,79,154,0.5);
+    }
+
+    .select-btn::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 50%;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .select-btn:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,0.3),
+        0 -4px 0 rgba(0,0,0,0.3) inset,
+        0 12px 25px rgba(255,79,154,0.6);
+    }
+    .select-btn:active { transform: translateY(1px); }
+  </style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<div class="hearts" id="hearts"></div>
+
+<div class="header">
+  <h1>🎀 PILIH HADIAHMU 🎀</h1>
+  <p>Ada 6 kejutan spesial menunggumu!</p>
+</div>
+
+<div class="carousel-wrap">
+  <div class="carousel" id="carousel">
+    <button class="arrow left" onclick="prev()">&#9664;</button>
+    <button class="arrow right" onclick="next()">&#9654;</button>
+  </div>
+
+  <div class="dots" id="dots"></div>
+
+  <div class="select-wrap">
+    <button class="select-btn" onclick="selectCard()">SELECT</button>
+  </div>
+</div>
+
+<script>
+const menus = [
+  { icon:"📖", title:"Memory Book",     desc:"Kenangan indah kita",      href:"features/memory.html",  color:"linear-gradient(135deg,#ff6b9d,#c9184a)" },
+  { icon:"🎯", title:"Love Quiz",       desc:"Seberapa kenal kamu?",     href:"features/quiz.html",    color:"linear-gradient(135deg,#ff4d6d,#ff2e63)" },
+  { icon:"💐", title:"Flower Surprise", desc:"Hujan bunga buat kamu",    href:"features/flowers.html", color:"linear-gradient(135deg,#ff85a1,#ff4d6d)" },
+  { icon:"🎟", title:"Love Coupons",    desc:"Voucher cinta spesial",    href:"features/coupons.html", color:"linear-gradient(135deg,#e84393,#9b1060)" },
+  { icon:"🧩", title:"Puzzle Photo",    desc:"Susun foto kita",          href:"features/puzzle.html",  color:"linear-gradient(135deg,#c9184a,#800f2f)" },
+  { icon:"💌", title:"Final Message",   desc:"Pesan dari hatiku",        href:"features/final.html",   color:"linear-gradient(135deg,#ff2d6e,#c9184a)" },
+];
+
+let current = 0;
+const total  = menus.length;
+
+function getPos(i) {
+  const diff = ((i - current) % total + total) % total;
+  if (diff === 0) return "center";
+  if (diff === 1) return "right1";
+  if (diff === 2) return "right2";
+  if (diff === total - 1) return "left1";
+  if (diff === total - 2) return "left2";
+  return "hidden";
+}
+
+function buildCards() {
+  const carousel = document.getElementById("carousel");
+  // Remove old cards
+  carousel.querySelectorAll(".card").forEach(c => c.remove());
+
+  menus.forEach((m, i) => {
+    const card = document.createElement("div");
+    card.className = "card " + getPos(i);
+    card.id = "card-" + i;
+    card.onclick = () => {
+      if (getPos(i) === "center") return;
+      const diff = ((i - current) % total + total) % total;
+      if (diff <= total / 2) { current = i; } else { current = i; }
+      updateCards();
+    };
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-top" style="background:${m.color}">
+          <div class="card-glow"></div>
+          <span class="card-icon">${m.icon}</span>
+        </div>
+        <div class="card-bottom">
+          <div class="card-title">${m.title}</div>
+          <div class="card-desc">${m.desc}</div>
+        </div>
+      </div>
+    `;
+    carousel.appendChild(card);
+  });
+
+  // Dots
+  const dotsEl = document.getElementById("dots");
+  dotsEl.innerHTML = "";
+  menus.forEach((_, i) => {
+    const d = document.createElement("div");
+    d.className = "dot" + (i === current ? " active" : "");
+    d.onclick = () => { current = i; updateCards(); };
+    dotsEl.appendChild(d);
+  });
+}
+
+function updateCards() {
+  menus.forEach((_, i) => {
+    const card = document.getElementById("card-" + i);
+    card.className = "card " + getPos(i);
+  });
+  // Dots
+  document.querySelectorAll(".dot").forEach((d, i) => {
+    d.className = "dot" + (i === current ? " active" : "");
+  });
+}
+
+function prev() { current = (current - 1 + total) % total; updateCards(); }
+function next() { current = (current + 1) % total; updateCards(); }
+
+function selectCard() {
+  const card = document.getElementById("card-" + current);
+  card.style.transform += " scale(0.95)";
+  setTimeout(() => { window.location.href = menus[current].href; }, 250);
+}
+
+// Swipe support
+let startX = 0;
+document.getElementById("carousel").addEventListener("touchstart", e => startX = e.touches[0].clientX);
+document.getElementById("carousel").addEventListener("touchend",   e => {
+  const dx = e.changedTouches[0].clientX - startX;
+  if (dx < -40) next();
+  else if (dx > 40) prev();
+});
+
+buildCards();
+
+/* STARS */
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+const stars = Array.from({length:150}, () => ({
+  x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+  r: Math.random()*1.5, a: Math.random(), s: 0.003+Math.random()*0.005
+}));
+function drawStars() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s => {
+    s.a += s.s;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(255,200,230,${0.2+Math.abs(Math.sin(s.a))*0.8})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+/* HEARTS */
+const heartsEl = document.getElementById("hearts");
+setInterval(() => {
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.innerHTML = ["💖","💕","❤","💗"][Math.floor(Math.random()*4)];
+  h.style.left = Math.random()*100+"vw";
+  h.style.fontSize = (8+Math.random()*14)+"px";
+  h.style.animationDuration = (5+Math.random()*5)+"s";
+  h.style.opacity = Math.random()*0.4+0.1;
+  heartsEl.appendChild(h);
+  setTimeout(()=>h.remove(), 10000);
+}, 400);
+</script>
+</body>
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voucher Spesial 💌</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: #f8a4bf;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Georgia', serif;
+  padding: 24px 16px;
+  overflow-x: hidden;
+}
+
+h1 {
+  font-size: 22px;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 6px;
+  text-shadow: 0 2px 8px rgba(180,60,90,0.3);
+  letter-spacing: 0.5px;
+}
+.subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.88);
+  text-align: center;
+  margin-bottom: 32px;
+  font-style: italic;
+}
+
+/* ===== GRID ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 560px;
+}
+
+/* ===== VOUCHER CARD ===== */
+.voucher {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(180,60,90,0.18);
+  cursor: pointer;
+  transition: transform .22s cubic-bezier(.175,.885,.32,1.275), box-shadow .22s;
+  position: relative;
+  user-select: none;
+}
+.voucher:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 14px 36px rgba(180,60,90,0.28);
+}
+.voucher:active {
+  transform: scale(0.97);
+}
+
+/* Top colored band */
+.voucher-top {
+  padding: 22px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.voucher-emoji {
+  font-size: 42px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.12));
+}
+.voucher-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 0.3px;
+  line-height: 1.3;
+}
+
+/* Perforated divider */
+.voucher-divider {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 12px;
+}
+.voucher-divider::before,
+.voucher-divider::after {
+  content: '';
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #f8a4bf;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.voucher-divider::before { margin-left: -22px; }
+.voucher-divider::after  { margin-right: -22px; }
+.divider-dots {
+  flex: 1;
+  border-top: 2.5px dashed #f0c0cc;
+  margin: 0 4px;
+}
+
+/* Bottom section */
+.voucher-bottom {
+  padding: 14px 16px 16px;
+  text-align: center;
+}
+.voucher-label {
+  font-size: 11px;
+  color: #bbb;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.voucher-desc {
+  font-size: 13px;
+  color: #888;
+  font-style: italic;
+  line-height: 1.5;
+}
+.voucher-btn {
+  margin-top: 12px;
+  background: transparent;
+  border: 2px solid currentColor;
+  border-radius: 20px;
+  padding: 7px 20px;
+  font-size: 13px;
+  font-family: 'Georgia', serif;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background .18s, color .18s;
+}
+
+/* Color themes per card */
+.v1 .voucher-top { background: linear-gradient(135deg,#f06292,#e91e8c); }
+.v1 .voucher-btn { color: #e91e8c; }
+.v1 .voucher-btn:hover { background:#fce4ec; }
+
+.v2 .voucher-top { background: linear-gradient(135deg,#ff8a65,#ff5722); }
+.v2 .voucher-btn { color: #ff5722; }
+.v2 .voucher-btn:hover { background:#fff3e0; }
+
+.v3 .voucher-top { background: linear-gradient(135deg,#7e57c2,#512da8); }
+.v3 .voucher-btn { color: #7e57c2; }
+.v3 .voucher-btn:hover { background:#ede7f6; }
+
+.v4 .voucher-top { background: linear-gradient(135deg,#ec407a,#c2185b); }
+.v4 .voucher-btn { color: #c2185b; }
+.v4 .voucher-btn:hover { background:#fce4ec; }
+
+/* ===== MODAL ===== */
+#modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(100,20,50,0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#modal-bg.show { display: flex; }
+
+#modal {
+  background: #fff;
+  border-radius: 24px;
+  padding: 36px 32px 32px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 16px 60px rgba(180,60,90,0.3);
+  animation: popIn .4s cubic-bezier(.175,.885,.32,1.275);
+  position: relative;
+}
+@keyframes popIn {
+  from { transform: scale(0.6); opacity:0; }
+  to   { transform: scale(1);   opacity:1; }
+}
+
+#modal-emoji { font-size: 64px; margin-bottom: 12px; }
+#modal-title { font-size: 20px; font-weight: bold; color: #333; margin-bottom: 8px; }
+#modal-msg   { font-size: 14px; color: #888; font-style:italic; line-height:1.6; margin-bottom: 24px; }
+
+#modal-close {
+  background: linear-gradient(135deg,#f06292,#e91e8c);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 32px;
+  font-size: 15px;
+  font-family: 'Georgia', serif;
+  cursor: pointer;
+  transition: opacity .18s;
+}
+#modal-close:hover { opacity: 0.88; }
+
+/* hearts confetti */
+#confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  overflow: hidden;
+}
+.cf {
+  position: absolute;
+  top: -20px;
+  font-size: 16px;
+  animation: cf-fall linear forwards;
+  opacity: 0;
+}
+@keyframes cf-fall {
+  0%   { opacity:1; transform: translateY(0) rotate(0deg); }
+  100% { opacity:0; transform: translateY(105vh) rotate(480deg); }
+}
+/* ===== TOMBOL KEMBALI ===== */
+.btn-back{
+  position:fixed;
+  top:20px;
+  left:20px;
+
+  width:55px;
+  height:55px;
+
+  border:none;
+  border-radius:50%;
+
+  background:white;
+  color:#e91e63;
+
+  font-size:24px;
+  font-weight:bold;
+
+  cursor:pointer;
+
+  z-index:999;
+
+  box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+  transition:.25s;
+}
+
+.btn-back:hover{
+  transform:scale(1.1);
+  background:#fff5f8;
+}
+</style>
+</head>
+<body>
+
+<button class="btn-back" onclick="kembaliMenu()">
+  ←
+</button>
+
+<h1>Voucher Spesial Buat Kamu 💌</h1>
+<p class="subtitle">Pilih satu voucher yang kamu mau ya sayang~</p>
+
+<div class="grid">
+
+  <!-- VOUCHER 1: Free Hug -->
+  <div class="voucher v1" onclick="pilih(0)">
+    <div class="voucher-top">
+      <div class="voucher-emoji">🤗</div>
+      <div class="voucher-title">FREE HUG</div>
+    </div>
+    <div class="voucher-divider"><div class="divider-dots"></div></div>
+    <div class="voucher-bottom">
+      <div class="voucher-label">Voucher #01</div>
+      <div class="voucher-desc">Satu pelukan hangat<br>kapan aja kamu mau</div>
+      <button class="voucher-btn">Pilih 💗</button>
+    </div>
+  </div>
+
+  <!-- VOUCHER 2: Free Jajan -->
+  <div class="voucher v2" onclick="pilih(1)">
+    <div class="voucher-top">
+      <div class="voucher-emoji">🍡</div>
+      <div class="voucher-title">FREE JAJAN</div>
+    </div>
+    <div class="voucher-divider"><div class="divider-dots"></div></div>
+    <div class="voucher-bottom">
+      <div class="voucher-label">Voucher #02</div>
+      <div class="voucher-desc">Jajan apapun yang kamu<br>pengen, aku yang bayar!</div>
+      <button class="voucher-btn">Pilih 🧡</button>
+    </div>
+  </div>
+
+  <!-- VOUCHER 3: Free Nonton -->
+  <div class="voucher v3" onclick="pilih(2)">
+    <div class="voucher-top">
+      <div class="voucher-emoji">🎬</div>
+      <div class="voucher-title">FREE NONTON</div>
+    </div>
+    <div class="voucher-divider"><div class="divider-dots"></div></div>
+    <div class="voucher-bottom">
+      <div class="voucher-label">Voucher #03</div>
+      <div class="voucher-desc">Nonton film bareng,<br>pilih film suka-suka kamu</div>
+      <button class="voucher-btn">Pilih 💜</button>
+    </div>
+  </div>
+
+  <!-- VOUCHER 4: Free Cium -->
+  <div class="voucher v4" onclick="pilih(3)">
+    <div class="voucher-top">
+      <div class="voucher-emoji">😘</div>
+      <div class="voucher-title">FREE CIUM 😂</div>
+    </div>
+    <div class="voucher-divider"><div class="divider-dots"></div></div>
+    <div class="voucher-bottom">
+      <div class="voucher-label">Voucher #04</div>
+      <div class="voucher-desc">Satu kecupan manis<br>khusus buat kamu 🤭</div>
+      <button class="voucher-btn">Pilih 💋</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal-bg" onclick="tutupModal(event)">
+  <div id="modal">
+    <div id="modal-emoji"></div>
+    <div id="modal-title"></div>
+    <div id="modal-msg"></div>
+    <button id="modal-close" onclick="tutupModal()">Yay, makasih! 💖</button>
+  </div>
+</div>
+
+<!-- Confetti layer -->
+<div id="confetti"></div>
+
+<script>
+const data = [
+  {
+    emoji: '🤗',
+    title: 'Kamu pilih Free Hug!',
+    msg: 'Siap! Aku akan peluk kamu erat-erat sampai kamu merasa hangat dan nyaman. Kapanpun kamu mau, aku selalu ada~ 💗',
+    confetti: ['💗','🤗','💕','🌸','✨']
+  },
+  {
+    emoji: '🍡',
+    title: 'Kamu pilih Free Jajan!',
+    msg: 'Boleh banget! Mau jajan apa hari ini? Es krim, boba, atau apapun — aku yang traktir! 🧡',
+    confetti: ['🍡','🧁','🍰','🍭','✨']
+  },
+  {
+    emoji: '🎬',
+    title: 'Kamu pilih Free Nonton!',
+    msg: 'Asiik! Nonton bareng yuk~ Mau film romantis, horor, atau komedi? Terserah kamu, aku ikutin aja 💜🍿',
+    confetti: ['🎬','🍿','⭐','🎉','💜']
+  },
+  {
+    emoji: '😘',
+    title: 'Kamu pilih Free Cium! 🤭',
+    msg: 'Hahaaa pinter~ Oke deal, voucher ini bisa dicairkan kapan aja ya! 😂💋 Makasih udah jadi yang terbaik.',
+    confetti: ['💋','😘','❤️','🌹','✨']
+  }
+];
+
+function pilih(i) {
+  const d = data[i];
+  document.getElementById('modal-emoji').textContent = d.emoji;
+  document.getElementById('modal-title').textContent = d.title;
+  document.getElementById('modal-msg').textContent   = d.msg;
+  document.getElementById('modal-bg').classList.add('show');
+  spawnConfetti(d.confetti);
+}
+
+function tutupModal(e) {
+  if (e && e.target !== document.getElementById('modal-bg') && e.target !== document.getElementById('modal-close')) return;
+  document.getElementById('modal-bg').classList.remove('show');
+  document.getElementById('confetti').innerHTML = '';
+}
+
+function spawnConfetti(emojis) {
+  const c = document.getElementById('confetti');
+  c.innerHTML = '';
+  for (let i = 0; i < 40; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'cf';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.fontSize = (12 + Math.random() * 14) + 'px';
+      const dur = 2 + Math.random() * 2.5;
+      el.style.animationDuration = dur + 's';
+      c.appendChild(el);
+      setTimeout(() => el.remove(), dur * 1000 + 100);
+    }, i * 60);
+  }
+}
+function kembaliMenu(){
+    window.location.href = "../menu.html";
+}
+</script>
+</body>
+</html>

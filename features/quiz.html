@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Quiz 💘</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+.btn-back{
+    position:fixed;
+    top:25px;
+    left:25px;
+    z-index:9999;
+
+    background:white;
+    color:#e91e63;
+
+    text-decoration:none;
+    font-weight:bold;
+    font-size:16px;
+
+    padding:12px 25px;
+    border-radius:50px;
+
+    box-shadow:0 4px 15px rgba(0,0,0,.15);
+
+    transition:.3s;
+}
+
+.btn-back:hover{
+    transform:translateY(-3px);
+    background:#fff0f5;
+}
+body {
+  background: #f48fb1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Georgia', serif;
+  overflow: hidden;
+}
+
+/* ===== CARD ===== */
+#quiz-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 44px 36px;
+  width: 380px;
+  text-align: center;
+  box-shadow: 0 8px 40px rgba(180,60,90,0.2);
+  position: relative;
+}
+
+#quiz-card h1 {
+  font-size: 26px;
+  color: #222;
+  margin-bottom: 20px;
+  font-style: normal;
+}
+
+#question {
+  font-size: 17px;
+  color: #333;
+  font-weight: bold;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+/* ===== BUTTONS ROW ===== */
+#btn-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  position: relative;
+  height: 52px;
+}
+
+#btn-yes {
+  background: linear-gradient(135deg, #f06292, #e91e8c);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 13px 28px;
+  font-size: 15px;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(233,30,140,0.35);
+  transition: transform .15s, box-shadow .15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+#btn-yes:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 20px rgba(233,30,140,0.45);
+}
+#btn-yes:active { transform: scale(0.97); }
+
+#btn-no {
+  background: #e0e0e0;
+  color: #555;
+  border: none;
+  border-radius: 30px;
+  padding: 13px 28px;
+  font-size: 15px;
+  font-family: 'Georgia', serif;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  position: absolute;    /* keluar dari flow agar bisa kabur bebas */
+  right: 0;
+}
+
+/* ===== RESULT ===== */
+#result {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: popIn .5s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+#result .big { font-size: 52px; }
+#result .msg { font-size: 19px; color: #d81b60; font-weight: bold; line-height: 1.5; }
+#result .sub { font-size: 14px; color: #888; }
+
+@keyframes popIn {
+  0%   { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* ===== HEARTS RAIN ===== */
+#hearts {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  overflow: hidden;
+}
+.heart-drop {
+  position: absolute;
+  top: -40px;
+  font-size: 22px;
+  animation: fall linear forwards;
+  opacity: 0;
+}
+@keyframes fall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+  <a href="../menu.html" class="btn-back">
+    ← Kembali
+</a>
+
+<div id="hearts"></div>
+
+<div id="quiz-card">
+  <div id="quiz-content">
+    <h1>quiz buat iin</h1>
+    <div id="question">Pertanyaan penting: ucupp ganteng kann?😊</div>
+    <div id="btn-row">
+      <button id="btn-yes" onclick="jawabIya()">gantengg bangett❤️</button>
+      <button id="btn-no" onmouseover="kabur()" ontouchstart="kabur()">ENGGAK 😝</button>
+    </div>
+  </div>
+
+  <div id="result">
+    <div class="big">💖</div>
+    <div class="msg">Yeay! thankyuuuuu😍<br>Iin ngamukan 🥰</div>
+    <div class="sub">Makasih udah jujur~ 💌</div>
+  </div>
+</div>
+
+<script>
+const btnNo = document.getElementById('btn-no');
+const card  = document.getElementById('quiz-card');
+let escaped = 0;
+
+// Posisi awal tombol nggak (relative ke card)
+let noX = 0; // akan dihitung saat pertama hover
+let noY = 0;
+
+function kabur() {
+  escaped++;
+  const cardRect = card.getBoundingClientRect();
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const bw = btnNo.offsetWidth;
+  const bh = btnNo.offsetHeight;
+
+  // Margin dari tepi viewport
+  const margin = 16;
+  let nx, ny;
+
+  // Coba acak posisi yang jauh dari posisi sekarang
+  let tries = 0;
+  do {
+    nx = margin + Math.random() * (vw - bw - margin * 2);
+    ny = margin + Math.random() * (vh - bh - margin * 2);
+    tries++;
+  } while (tries < 20 && Math.hypot(nx - parseFloat(btnNo.style.left||vw*0.7), ny - parseFloat(btnNo.style.top||vh*0.5)) < 120);
+
+  btnNo.style.position = 'fixed';
+  btnNo.style.left = nx + 'px';
+  btnNo.style.top  = ny + 'px';
+  btnNo.style.right = 'auto';
+
+  // Makin sering kabur, makin mungil tombolnya
+  const scale = Math.max(0.5, 1 - escaped * 0.06);
+  btnNo.style.transform = `scale(${scale})`;
+  btnNo.style.opacity   = Math.max(0.35, 1 - escaped * 0.08);
+}
+
+function jawabIya() {
+  // Sembunyikan konten quiz, tampilkan hasil
+  document.getElementById('quiz-content').style.display = 'none';
+  btnNo.style.display = 'none';
+
+  const res = document.getElementById('result');
+  res.style.display = 'flex';
+
+  // Hujan hati
+  hujanHati();
+}
+
+function hujanHati() {
+  const container = document.getElementById('hearts');
+  const emojis = ['💖','💕','💗','💓','💝','🌸','✨','💘'];
+  let count = 0;
+
+  function spawnHeart() {
+    if (count > 60) return;
+    count++;
+    const el = document.createElement('div');
+    el.className = 'heart-drop';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = (16 + Math.random() * 18) + 'px';
+    const dur = 1.8 + Math.random() * 2;
+    el.style.animationDuration = dur + 's';
+    el.style.animationDelay = '0s';
+    container.appendChild(el);
+    setTimeout(() => el.remove(), dur * 1000 + 200);
+    setTimeout(spawnHeart, 80 + Math.random() * 120);
+  }
+  spawnHeart();
+}
+</script>
+</body>
+</html>

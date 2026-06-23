@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowers For You 🌷</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: #f8a4bf;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== HEARTS RAIN (behind flower) ===== */
+#hearts-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.heart {
+  position: absolute;
+  top: -30px;
+  font-size: 14px;
+  opacity: 0;
+  animation: fall linear infinite;
+  user-select: none;
+}
+
+@keyframes fall {
+  0%   { transform: translateY(0) rotate(0deg) scale(1);   opacity: 0; }
+  8%   { opacity: 0.8; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(105vh) rotate(360deg) scale(0.7); opacity: 0; }
+}
+
+/* ===== FLOWER IMAGE ===== */
+#flower-wrap {
+  position: relative;
+  z-index: 1;
+  animation: sway 3.8s ease-in-out infinite;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 20px 36px rgba(180,60,100,0.25));
+}
+
+#flower-wrap img {
+  width: 340px;
+  max-width: 90vw;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+/* ===== BACK BUTTON ===== */
+.btn-back{
+  position:fixed;
+  top:25px;
+  left:25px;
+  z-index:10;
+
+  width:50px;
+  height:50px;
+
+  border:none;
+  border-radius:50%;
+
+  background:white;
+  color:#e91e63;
+
+  font-size:22px;
+  font-weight:bold;
+
+  cursor:pointer;
+
+  box-shadow:0 5px 15px rgba(0,0,0,.15);
+  transition:.25s;
+}
+
+.btn-back:hover{
+  transform:scale(1.1);
+  background:#fff5f8;
+}
+
+@keyframes sway {
+  0%   { transform: rotate(-3.5deg); }
+  50%  { transform: rotate(3.5deg);  }
+  100% { transform: rotate(-3.5deg); }
+}
+</style>
+</head>
+<body>
+
+<button class="btn-back" onclick="kembaliMenu()">
+  ←
+</button>
+
+<!-- Hearts behind -->
+<div id="hearts-container"></div>
+
+<!-- Hearts behind -->
+<div id="hearts-container"></div>
+
+<!-- Flower bouquet -->
+<div id="flower-wrap">
+  <img src="../assets/img/Flowers.png">
+</div>
+
+<script>
+// ===== SPAWN HEARTS =====
+const container = document.getElementById('hearts-container');
+const heartEmojis = ['💕','💗','💖','💓','🌸','💝','✨','💞','🩷'];
+
+function spawnHeart() {
+  const el = document.createElement('div');
+  el.className = 'heart';
+  el.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+
+  const size = 10 + Math.random() * 10; // 10px–20px
+  el.style.fontSize = size + 'px';
+  el.style.left = (Math.random() * 100) + 'vw';
+
+  const dur = 4 + Math.random() * 5; // 4s–9s
+  el.style.animationDuration = dur + 's';
+  el.style.animationDelay   = (Math.random() * 3) + 's';
+
+  container.appendChild(el);
+
+  // Remove after animation done
+  setTimeout(() => el.remove(), (dur + 3) * 1000);
+}
+
+// Spawn continuously
+function loop() {
+  spawnHeart();
+  setTimeout(loop, 280 + Math.random() * 320);
+}
+
+// Initial burst
+for (let i = 0; i < 18; i++) {
+  setTimeout(spawnHeart, i * 120);
+}
+loop();
+
+// Subtle random sway offset per load
+document.getElementById('flower-wrap').style.animationDelay =
+  ((Math.random() - 0.5) * 1.5) + 's';
+  function kembaliMenu(){
+  window.location.href = "../menu.html";
+}
+</script>
+</body>
+</html>

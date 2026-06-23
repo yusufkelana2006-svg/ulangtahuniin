@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untukmu, di Hari Spesial</title>
+<style>
+  :root{
+    --cream:#fbf3e7;
+    --plum:#4a2545;
+    --plum-deep:#2e1530;
+    --gold:#d9a441;
+    --rose:#e8a7a0;
+    --ink:#3a2436;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    background: radial-gradient(circle at 50% 20%, #5e3158 0%, var(--plum) 45%, var(--plum-deep) 100%);
+    font-family:'Georgia','Iowan Old Style', serif;
+    overflow-x:hidden;
+    color:var(--ink);
+  }
+
+  /* twinkly background dots */
+  .stars{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+  }
+  .stars span{
+    position:absolute;
+    width:3px;
+    height:3px;
+    background:var(--gold);
+    border-radius:50%;
+    opacity:0.5;
+    animation:twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:.15; transform:scale(1);}
+    50%{opacity:.8; transform:scale(1.4);}
+  }
+
+  .stage{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+    z-index:1;
+  }
+
+  .heading{
+    text-align:center;
+    color:var(--cream);
+    margin-bottom:46px;
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .heading .eyebrow{
+    display:block;
+    letter-spacing:.35em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--gold);
+    margin-bottom:14px;
+    font-family:'Trebuchet MS', sans-serif;
+  }
+  .heading h1{
+    font-size:clamp(28px, 5vw, 44px);
+    margin:0;
+    font-weight:400;
+    font-style:italic;
+    line-height:1.3;
+  }
+  .heading.hide{
+    opacity:0;
+    transform:translateY(-10px);
+    pointer-events:none;
+  }
+
+  /* ===== ENVELOPE ===== */
+  .envelope-wrap{
+    position:relative;
+    width:280px;
+    height:190px;
+    cursor:pointer;
+    transition:transform .5s ease, opacity .5s ease;
+  }
+  .envelope-wrap:hover .envelope-body{
+    transform:translateY(-4px);
+  }
+  .envelope-wrap.opened{
+    pointer-events:none;
+  }
+  .hint{
+    text-align:center;
+    color:var(--cream);
+    opacity:.7;
+    font-family:'Trebuchet MS', sans-serif;
+    font-size:13px;
+    letter-spacing:.05em;
+    margin-top:22px;
+    animation:pulseHint 2s ease-in-out infinite;
+  }
+  @keyframes pulseHint{
+    0%,100%{opacity:.45;}
+    50%{opacity:.9;}
+  }
+  .hint.hide{ opacity:0; }
+
+  .envelope-body{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, #f3e3d3, #e9d2b8);
+    border-radius:6px;
+    box-shadow:
+      0 18px 40px rgba(20,5,25,.45),
+      inset 0 0 0 1px rgba(0,0,0,.06);
+    transition:transform .4s ease;
+    overflow:hidden;
+  }
+
+  /* envelope pockets (the V shapes) drawn with borders */
+  .pocket-left, .pocket-right{
+    position:absolute;
+    top:0;
+    width:50%;
+    height:100%;
+    background:#e3c8a6;
+  }
+  .pocket-left{
+    left:0;
+    clip-path:polygon(0 0, 100% 50%, 0 100%);
+  }
+  .pocket-right{
+    right:0;
+    clip-path:polygon(100% 0, 0 50%, 100% 100%);
+  }
+
+  .flap{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:linear-gradient(160deg, #f6e7d8, #ead0ac);
+    clip-path:polygon(0 0, 100% 0, 50% 62%);
+    transform-origin:top center;
+    transform-style:preserve-3d;
+    transition:transform 1s cubic-bezier(.65,0,.35,1);
+    box-shadow:0 2px 6px rgba(0,0,0,.12);
+    z-index:6;
+  }
+  .flap::after{
+    content:"";
+    position:absolute;
+    top:36%;
+    left:50%;
+    width:34px;
+    height:34px;
+    background:var(--gold);
+    border-radius:50%;
+    transform:translate(-50%,-50%) rotate(45deg);
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+  }
+  .flap::before{
+    content:"♥";
+    position:absolute;
+    top:36%;
+    left:50%;
+    transform:translate(-50%,-58%);
+    color:#fff8ea;
+    font-size:14px;
+    z-index:7;
+  }
+
+  .envelope-wrap.opened .flap{
+    transform:rotateX(180deg);
+    z-index:2;
+  }
+
+  /* letter that slides up out of the envelope */
+  .letter{
+    position:absolute;
+    left:6%;
+    width:88%;
+    height:84%;
+    top:10%;
+    background:#fffdf8;
+    border-radius:4px;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+    z-index:4;
+    transform:translateY(6%) scale(.96);
+    transition:transform 1s cubic-bezier(.34,1.4,.4,1) .15s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:14px;
+  }
+  .letter-peek{
+    font-family:'Trebuchet MS', sans-serif;
+    font-size:11px;
+    color:#c2a98a;
+    letter-spacing:.1em;
+  }
+  .envelope-wrap.opened .letter{
+    transform:translateY(-150%) scale(1.02);
+    z-index:8;
+  }
+
+  /* ===== FULL LETTER MODAL ===== */
+  .letter-modal{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .6s ease;
+    padding:24px;
+  }
+  .letter-modal.show{
+    opacity:1;
+    pointer-events:auto;
+  }
+  .modal-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(20,8,22,.78);
+    backdrop-filter:blur(3px);
+  }
+
+  .paper{
+    position:relative;
+    width:min(560px, 92vw);
+    max-height:86vh;
+    overflow-y:auto;
+    background:
+      linear-gradient(180deg, #fffdf7 0%, #fff9ed 100%);
+    border-radius:3px;
+    padding:48px 44px 40px;
+    box-shadow:0 30px 80px rgba(0,0,0,.5);
+    transform:translateY(40px) scale(.85) rotateX(8deg);
+    opacity:0;
+    transition:transform .7s cubic-bezier(.2,.9,.25,1.1), opacity .5s ease;
+  }
+  .letter-modal.show .paper{
+    transform:translateY(0) scale(1) rotateX(0deg);
+    opacity:1;
+  }
+  .paper::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 34px,
+      rgba(180,140,150,.12) 35px
+    );
+    pointer-events:none;
+  }
+
+  .close-btn{
+    position:absolute;
+    top:14px;
+    right:16px;
+    width:32px;
+    height:32px;
+    border:none;
+    background:transparent;
+    color:var(--plum);
+    font-size:20px;
+    cursor:pointer;
+    opacity:.55;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:2;
+  }
+  .close-btn:hover{ opacity:1; transform:rotate(90deg);}
+
+  .paper .eyebrow{
+    display:block;
+    text-align:center;
+    text-transform:uppercase;
+    letter-spacing:.3em;
+    font-size:11px;
+    color:var(--gold);
+    font-family:'Trebuchet MS', sans-serif;
+    margin-bottom:18px;
+  }
+
+  .paper h2{
+    text-align:center;
+    font-style:italic;
+    font-weight:400;
+    color:var(--plum);
+    font-size:clamp(24px,4vw,32px);
+    margin:0 0 28px;
+  }
+
+  .paper p{
+    font-size:16px;
+    line-height:1.85;
+    color:#4a3a3a;
+    margin:0 0 18px;
+    opacity:0;
+    transform:translateY(8px);
+    animation:lineIn .6s ease forwards;
+  }
+  .letter-modal.show .paper p{ animation-play-state:running; }
+  .paper p:nth-of-type(1){animation-delay:.5s;}
+  .paper p:nth-of-type(2){animation-delay:.75s;}
+  .paper p:nth-of-type(3){animation-delay:1s;}
+  .paper p:nth-of-type(4){animation-delay:1.25s;}
+
+  @keyframes lineIn{
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .signature{
+    text-align:right;
+    font-style:italic;
+    color:var(--plum);
+    font-size:19px;
+    margin-top:30px;
+    opacity:0;
+    animation:lineIn .6s ease forwards;
+    animation-delay:1.5s;
+  }
+
+  .cake-row{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:28px;
+    font-size:26px;
+    opacity:0;
+    animation:lineIn .6s ease forwards;
+    animation-delay:1.7s;
+  }
+  .cake-row span{
+    display:inline-block;
+    animation:bob 2.4s ease-in-out infinite;
+  }
+  .cake-row span:nth-child(2){ animation-delay:.3s; }
+  .cake-row span:nth-child(3){ animation-delay:.6s; }
+  @keyframes bob{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-6px); }
+  }
+
+  /* confetti */
+  .confetti-layer{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:60;
+    overflow:hidden;
+  }
+  .confetti-piece{
+    position:absolute;
+    top:-10px;
+    width:8px;
+    height:14px;
+    opacity:.9;
+    animation:fall linear forwards;
+  }
+  @keyframes fall{
+    to{
+      transform:translateY(110vh) rotate(540deg);
+      opacity:0;
+    }
+  }
+
+  @media (max-width:420px){
+    .envelope-wrap{ width:240px; height:165px; }
+    .paper{ padding:36px 24px 30px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{
+      animation-duration:.01ms !important;
+      transition-duration:.01ms !important;
+    }
+  }
+  /* ===== BACK BUTTON ===== */
+.btn-back{
+  position:fixed;
+  top:20px;
+  left:20px;
+
+  width:55px;
+  height:55px;
+
+  border:none;
+  border-radius:50%;
+
+  background:rgba(255,255,255,.95);
+  color:#4a2545;
+
+  font-size:26px;
+  font-weight:bold;
+
+  cursor:pointer;
+  z-index:999;
+
+  box-shadow:0 6px 20px rgba(0,0,0,.25);
+
+  transition:.25s ease;
+}
+
+.btn-back:hover{
+  transform:scale(1.1);
+  background:white;
+}
+</style>
+</head>
+<body>
+  <button class="btn-back" onclick="kembaliMenu()">
+  ←
+</button>
+
+<div class="stars" id="stars"></div>
+
+<div class="stage">
+  <div class="heading" id="heading">
+    <span class="eyebrow">Sebuah pesan kecil</span>
+    <h1>Ada surat untukmu...<br>klik untuk membukanya 💌</h1>
+  </div>
+
+  <div class="envelope-wrap" id="envelopeWrap">
+    <div class="envelope-body">
+      <div class="pocket-left"></div>
+      <div class="pocket-right"></div>
+      <div class="letter">
+        <span class="letter-peek">untukmu, yang berulang tahun</span>
+      </div>
+      <div class="flap"></div>
+    </div>
+  </div>
+
+  <div class="hint" id="hint">sentuh suratnya ✦</div>
+</div>
+
+<div class="letter-modal" id="letterModal">
+  <div class="modal-backdrop" id="backdrop"></div>
+  <div class="paper">
+    <button class="close-btn" id="closeBtn" aria-label="Tutup surat">✕</button>
+    <span class="eyebrow">Selamat Ulang Tahun</span>
+    <h2>Untuk Kamu yang Istimewa</h2>
+    <p>Hari ini adalah harimu — hari di mana dunia merayakan kehadiranmu, dan aku ikut bersyukur karena kamu ada dan menjadi bagian dari hidupku.</p>
+    <p>Semoga di usia yang baru ini, langkahmu makin ringan, hatimu makin tenang, dan setiap doa baik yang kamu ucapkan menemukan jalannya untuk menjadi kenyataan.</p>
+    <p>Teruslah jadi dirimu yang hangat dan baik. Dunia ini sedikit lebih cerah karena ada kamu di dalamnya.</p>
+    <p>Selamat bertambah usia. Selamat merayakan diri sendiri, hari ini dan selalu.</p>
+    <p>Oh iya, ojo ngamuk tok aee.</p>
+    <div class="signature">— lopp youu</div>
+    <div class="cake-row"><span>🎂</span><span>🎉</span><span>🎈</span></div>
+  </div>
+</div>
+
+<div class="confetti-layer" id="confettiLayer"></div>
+
+<script>
+  // Background twinkle stars
+  const starsContainer = document.getElementById('stars');
+  for(let i=0;i<40;i++){
+    const s = document.createElement('span');
+    s.style.left = Math.random()*100 + '%';
+    s.style.top = Math.random()*100 + '%';
+    s.style.animationDelay = (Math.random()*3) + 's';
+    s.style.animationDuration = (2 + Math.random()*3) + 's';
+    starsContainer.appendChild(s);
+  }
+
+  const envelopeWrap = document.getElementById('envelopeWrap');
+  const heading = document.getElementById('heading');
+  const hint = document.getElementById('hint');
+  const letterModal = document.getElementById('letterModal');
+  const backdrop = document.getElementById('backdrop');
+  const closeBtn = document.getElementById('closeBtn');
+  const confettiLayer = document.getElementById('confettiLayer');
+
+  let opened = false;
+
+  function spawnConfetti(){
+    const colors = ['#d9a441','#e8a7a0','#fbf3e7','#9c5b8e','#f0c75e'];
+    for(let i=0;i<60;i++){
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random()*100 + 'vw';
+      piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+      piece.style.animationDuration = (2.5 + Math.random()*2) + 's';
+      piece.style.animationDelay = (Math.random()*0.4) + 's';
+      piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      confettiLayer.appendChild(piece);
+      setTimeout(()=> piece.remove(), 5000);
+    }
+  }
+
+  envelopeWrap.addEventListener('click', () => {
+    if(opened) return;
+    opened = true;
+    envelopeWrap.classList.add('opened');
+    heading.classList.add('hide');
+    hint.classList.add('hide');
+
+    // Wait for envelope-opening animation, then show full letter
+    setTimeout(() => {
+      letterModal.classList.add('show');
+      spawnConfetti();
+    }, 900);
+  });
+
+  function closeLetter(){
+    letterModal.classList.remove('show');
+  }
+
+  closeBtn.addEventListener('click', closeLetter);
+  backdrop.addEventListener('click', closeLetter);
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeLetter();
+  });
+  function kembaliMenu(){
+    window.location.href = "../menu.html";
+}
+</script>
+
+</body>
+</html>

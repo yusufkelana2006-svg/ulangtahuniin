@@ -1,0 +1,369 @@
+.book-container{
+    position:relative;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    max-width:660px;
+    height:440px;
+}
+
+.book-render-area{
+    position:relative;
+    width:280px;
+    height:380px;
+    perspective:2000px;
+}
+
+.book-page{
+    position:absolute;
+    width:100%;
+    height:100%;
+    top:0;
+    left:0;
+
+    transform-origin:left center;
+    transform-style:preserve-3d;
+
+    transition:transform .8s cubic-bezier(.25,1,.5,1);
+}
+
+.book-page.flipped-effect{
+    transform:rotateY(-180deg);
+}
+
+.page-front,
+.page-back{
+    position:absolute;
+    width:100%;
+    height:100%;
+
+    backface-visibility:hidden;
+
+    background:white;
+}
+
+.page-back{
+    transform:rotateY(180deg);
+}
+body{
+    background:#ffb6c1;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.modal{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    height:100vh;
+}
+
+.cover-front-design{
+    width:100%;
+    height:100%;
+    background:linear-gradient(135deg,#ffb6c1,#ff8da1);
+    border-radius:0 15px 15px 0;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    position:relative;
+}
+
+.book-spine{
+    position:absolute;
+    left:0;
+    top:0;
+    width:20px;
+    height:100%;
+    background:rgba(0,0,0,.15);
+}
+
+.badge-gold{
+    background:#fffdf2;
+    border:3px double #dfba6b;
+    padding:15px 30px;
+    border-radius:12px;
+}
+
+.hint-tap{
+    position:absolute;
+    bottom:20px;
+    color:white;
+}
+
+.frame-foto-buku{
+    width:100%;
+    height:220px;
+    overflow:hidden;
+    border-radius:10px;
+}
+
+.frame-foto-buku img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.teks-buku-caption{
+    text-align:center;
+    padding:10px;
+}
+
+.nomor-halaman{
+    text-align:center;
+    color:#999;
+}
+
+.cover-back-design{
+    width:100%;
+    height:100%;
+    background:linear-gradient(135deg,#ff8da1,#ffb6c1);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.btn-close-book{
+    position:absolute;
+    bottom:-50px;
+    padding:10px 20px;
+}
+/* =========================
+   AREA BUKU
+========================= */
+
+.book-render-area{
+    position:relative;
+    width:720px;
+    height:500px;
+    perspective:2500px;
+}
+
+/* =========================
+   COVER
+========================= */
+
+.book-cover{
+    position:absolute;
+    inset:0;
+
+    background:linear-gradient(
+        135deg,
+        #f8b3c1,
+        #ee95a7
+    );
+
+    border-radius:8px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.25);
+
+    z-index:100;
+
+    transform-origin:left center;
+
+    transition:
+        transform 1.2s cubic-bezier(.22,1,.36,1);
+
+    cursor:pointer;
+}
+
+.book-cover.open{
+
+    transform:
+        rotateY(-165deg);
+
+}
+
+/* =========================
+   PUNGGUNG BUKU
+========================= */
+
+.book-spine{
+    position:absolute;
+    left:0;
+    top:0;
+
+    width:40px;
+    height:100%;
+
+    background:
+        rgba(0,0,0,.12);
+}
+
+/* =========================
+   JUDUL
+========================= */
+
+.badge-gold{
+    background:#fff7e6;
+
+    border:
+        2px solid #dfba6b;
+
+    padding:
+        18px 42px;
+
+    border-radius:16px;
+}
+
+.badge-gold h2{
+    color:#b8860b;
+    font-size:42px;
+}
+
+/* =========================
+   HINT
+========================= */
+
+.hint-tap{
+    position:absolute;
+
+    bottom:35px;
+
+    color:white;
+
+    font-size:20px;
+
+    font-weight:600;
+}
+
+/* =========================
+   ISI BUKU
+========================= */
+
+.book-content{
+
+    position:absolute;
+    inset:0;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transition:
+        opacity .5s ease;
+
+}
+
+.book-content.show{
+
+    opacity:1;
+
+    visibility:visible;
+
+}
+
+/* =========================
+   DUA HALAMAN
+========================= */
+
+.spread{
+
+    width:100%;
+    height:100%;
+
+    background:white;
+
+    border-radius:20px;
+
+    display:flex;
+
+    overflow:hidden;
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.25);
+
+}
+
+.page-left,
+.page-right{
+
+    flex:1;
+
+    padding:30px;
+
+    position:relative;
+
+}
+
+.page-left{
+
+    border-right:
+        2px solid #f0d7e7;
+
+}
+
+/* =========================
+   FOTO
+========================= */
+
+.photo-frame{
+
+    width:100%;
+    height:260px;
+
+    border-radius:14px;
+
+    overflow:hidden;
+
+    margin-bottom:25px;
+
+}
+
+.photo-frame img{
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+}
+
+/* =========================
+   CAPTION
+========================= */
+
+.caption{
+
+    text-align:center;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:#5f433f;
+
+    line-height:1.5;
+
+}
+
+/* =========================
+   NOMOR HALAMAN
+========================= */
+
+.page-number{
+
+    position:absolute;
+
+    bottom:20px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    color:#999;
+}

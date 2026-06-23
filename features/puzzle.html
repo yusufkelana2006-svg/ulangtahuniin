@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puzzle Photo 🧩</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Dancing+Script:wght@700&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', Arial, sans-serif;
+      background: linear-gradient(135deg, #ffd1dc, #ff9eb5);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .nav { position: fixed; top: 16px; left: 16px; z-index: 100; }
+    .back-btn {
+      background: rgba(255,255,255,0.85); border: none; border-radius: 50px;
+      padding: 10px 18px; font-weight: 700; font-size: 13px; color: #ff4d6d;
+      cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-decoration: none; display: inline-block; transition: 0.2s;
+    }
+    .back-btn:hover { transform: scale(1.05); }
+
+    .header { text-align: center; padding: 80px 20px 14px; }
+    .header h1 { font-family: 'Dancing Script', cursive; font-size: 42px; color: white; text-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .header p { color: rgba(255,255,255,0.85); font-size: 14px; margin-top: 5px; }
+
+    .game-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 10px 20px 60px;
+    }
+
+    /* INFO BAR */
+    .info-bar {
+      display: flex; gap: 16px; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .info-chip {
+      background: rgba(255,255,255,0.8); border-radius: 50px;
+      padding: 8px 18px; font-size: 13px; font-weight: 700; color: #ff4d6d;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    /* PUZZLE GRID */
+    .puzzle-board {
+      width: 300px; height: 300px;
+      display: grid;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .puzzle-board.grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .puzzle-board.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .tile {
+      position: relative;
+      cursor: pointer;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      overflow: hidden;
+      transition: transform 0.1s;
+      background: #ffccd5;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .tile:hover { transform: scale(0.96); z-index: 2; }
+    .tile.empty { background: rgba(255,255,255,0.15); cursor: default; }
+    .tile.empty:hover { transform: none; }
+    .tile.correct { border-color: rgba(255,255,255,0.8); }
+
+    .tile-num {
+      font-size: 28px; font-weight: 800; color: rgba(255,77,109,0.5);
+      user-select: none;
+    }
+
+    /* when image is loaded */
+    .tile.has-img .tile-num { display: none; }
+
+    /* BUTTONS */
+    .btn-row {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .action-btn {
+      padding: 11px 22px; border: none; border-radius: 999px;
+      font-weight: 800; font-size: 13px; cursor: pointer; transition: 0.2s;
+      font-family: 'Nunito', Arial, sans-serif;
+    }
+    .action-btn:hover { transform: scale(1.05); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff4d6d, #ff2e63);
+      color: white; box-shadow: 0 8px 20px rgba(255,46,99,0.3);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,0.85);
+      color: #ff4d6d; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    /* DIFFICULTY */
+    .difficulty {
+      display: flex; gap: 10px; margin-bottom: 16px;
+    }
+    .diff-btn {
+      padding: 8px 18px; border: 2px solid rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.5); border-radius: 999px;
+      font-size: 12px; font-weight: 800; color: white;
+      cursor: pointer; transition: 0.2s;
+      font-family: 'Nunito', Arial, sans-serif;
+    }
+    .diff-btn.active { background: white; color: #ff4d6d; }
+    .diff-btn:hover  { background: rgba(255,255,255,0.8); color: #ff4d6d; }
+
+    /* IMAGE UPLOAD */
+    .upload-area {
+      background: rgba(255,255,255,0.75); backdrop-filter: blur(10px);
+      border: 2px dashed #ffb3c6; border-radius: 16px;
+      padding: 20px; text-align: center; cursor: pointer;
+      width: 100%; max-width: 300px; margin-bottom: 16px;
+      transition: 0.2s;
+    }
+    .upload-area:hover { border-color: #ff4d6d; }
+    .upload-area p { color: #ff4d6d; font-weight: 700; font-size: 13px; }
+    #imgInput { display: none; }
+
+    /* WIN MODAL */
+    .win-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+      z-index: 200; justify-content: center; align-items: center;
+    }
+    .win-modal.show { display: flex; }
+    .win-card {
+      background: white; border-radius: 28px;
+      padding: 40px 30px; text-align: center;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+      animation: popIn 0.5s ease;
+      max-width: 320px; width: 90%;
+    }
+    @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .win-emoji { font-size: 70px; margin-bottom: 12px; }
+    .win-title { font-family: 'Dancing Script', cursive; font-size: 36px; color: #ff2e63; margin-bottom: 8px; }
+    .win-moves { font-size: 16px; color: #888; margin-bottom: 20px; }
+    .win-btn {
+      padding: 13px 30px; border: none; border-radius: 999px;
+      background: linear-gradient(135deg, #ff4d6d, #ff2e63);
+      color: white; font-weight: 800; font-size: 15px;
+      cursor: pointer; transition: 0.2s;
+      font-family: 'Nunito', Arial, sans-serif;
+      box-shadow: 0 10px 25px rgba(255,46,99,0.35);
+    }
+    .win-btn:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body>
+
+<div class="nav"><a class="back-btn" href="../menu.html">← Kembali</a></div>
+
+<div class="header">
+  <h1>🧩 Puzzle Photo</h1>
+  <p>Susun fotonya dan temukan kejutannya! 💕</p>
+</div>
+
+<div class="game-wrap">
+  <div class="difficulty">
+    <button class="diff-btn active" onclick="setDiff(3,this)">Easy (3×3)</button>
+    <button class="diff-btn"       onclick="setDiff(4,this)">Hard (4×4)</button>
+  </div>
+
+  <div class="info-bar">
+    <div class="info-chip">🔀 Langkah: <span id="moves">0</span></div>
+    <div class="info-chip">⏱️ <span id="timer">0:00</span></div>
+  </div>
+
+  <div class="upload-area" onclick="document.getElementById('imgInput').click()">
+    <p>📷 Klik untuk upload foto (opsional)</p>
+    <p style="font-size:11px;color:#aaa;margin-top:4px">Atau mainkan dengan nomor dulu</p>
+  </div>
+  <input type="file" id="imgInput" accept="image/*" onchange="loadImage(event)">
+
+  <div class="puzzle-board grid-3" id="board"></div>
+
+  <div class="btn-row">
+    <button class="action-btn btn-primary" onclick="shufflePuzzle()">🔀 Acak Ulang</button>
+    <button class="action-btn btn-ghost"   onclick="solvePuzzle()">💡 Lihat Jawaban</button>
+  </div>
+</div>
+
+<!-- WIN MODAL -->
+<div class="win-modal" id="winModal">
+  <div class="win-card">
+    <div class="win-emoji">🎉</div>
+    <div class="win-title">Puzzle Selesai!</div>
+    <div class="win-moves" id="winMoves"></div>
+    <button class="win-btn" onclick="closeWin()">🔄 Main Lagi</button>
+    <br><br>
+    <a class="back-btn" href="../menu.html" style="display:inline-block;margin-top:8px">← Kembali ke Menu</a>
+  </div>
+</div>
+
+<script>
+let N = 3;
+let tiles = [];
+let emptyIdx = N * N - 1;
+let moves = 0;
+let timerSec = 0;
+let timerInterval = null;
+let imgSrc = null;
+
+function setDiff(n, btn) {
+  N = n;
+  document.querySelectorAll(".diff-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  const board = document.getElementById("board");
+  board.className = "puzzle-board grid-" + n;
+  initPuzzle();
+}
+
+function initPuzzle() {
+  moves = 0; timerSec = 0;
+  document.getElementById("moves").textContent = 0;
+  document.getElementById("timer").textContent = "0:00";
+  clearInterval(timerInterval);
+
+  tiles = Array.from({ length: N * N - 1 }, (_, i) => i + 1);
+  tiles.push(0); // 0 = empty
+  emptyIdx = N * N - 1;
+  renderBoard();
+}
+
+function shufflePuzzle() {
+  // Perform many random legal moves
+  for (let i = 0; i < 300; i++) {
+    const neighbors = getNeighbors(emptyIdx);
+    const pick = neighbors[Math.floor(Math.random() * neighbors.length)];
+    swap(pick, emptyIdx);
+    emptyIdx = pick;
+  }
+  moves = 0;
+  document.getElementById("moves").textContent = 0;
+  timerSec = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(tickTimer, 1000);
+  renderBoard();
+}
+
+function tickTimer() {
+  timerSec++;
+  const m = Math.floor(timerSec / 60);
+  const s = timerSec % 60;
+  document.getElementById("timer").textContent = m + ":" + String(s).padStart(2, "0");
+}
+
+function getNeighbors(idx) {
+  const row = Math.floor(idx / N), col = idx % N;
+  const res = [];
+  if (row > 0) res.push(idx - N);
+  if (row < N-1) res.push(idx + N);
+  if (col > 0) res.push(idx - 1);
+  if (col < N-1) res.push(idx + 1);
+  return res;
+}
+
+function swap(a, b) {
+  [tiles[a], tiles[b]] = [tiles[b], tiles[a]];
+}
+
+function renderBoard() {
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+  const size = 300 / N;
+
+  tiles.forEach((val, idx) => {
+    const tile = document.createElement("div");
+    tile.className = "tile" + (val === 0 ? " empty" : "");
+    tile.style.width = size + "px";
+    tile.style.height = size + "px";
+
+    if (val !== 0) {
+      if (imgSrc) {
+        tile.classList.add("has-img");
+        const row = Math.floor((val - 1) / N);
+        const col = (val - 1) % N;
+        tile.style.backgroundImage = `url(${imgSrc})`;
+        tile.style.backgroundSize = `${300}px ${300}px`;
+        tile.style.backgroundPosition = `-${col * size}px -${row * size}px`;
+      } else {
+        const num = document.createElement("div");
+        num.className = "tile-num";
+        num.textContent = val;
+        tile.appendChild(num);
+      }
+
+      // Highlight correct position
+      if (val === idx + 1) tile.classList.add("correct");
+
+      tile.addEventListener("click", () => clickTile(idx));
+    }
+    board.appendChild(tile);
+  });
+}
+
+function clickTile(idx) {
+  const neighbors = getNeighbors(emptyIdx);
+  if (!neighbors.includes(idx)) return;
+  swap(idx, emptyIdx);
+  emptyIdx = idx;
+  moves++;
+  document.getElementById("moves").textContent = moves;
+  renderBoard();
+  if (checkWin()) showWin();
+}
+
+function checkWin() {
+  for (let i = 0; i < N * N - 1; i++) {
+    if (tiles[i] !== i + 1) return false;
+  }
+  return true;
+}
+
+function showWin() {
+  clearInterval(timerInterval);
+  const m = Math.floor(timerSec / 60);
+  const s = timerSec % 60;
+  document.getElementById("winMoves").textContent =
+    `${moves} langkah • ${m}:${String(s).padStart(2,"0")} menit`;
+  document.getElementById("winModal").className = "win-modal show";
+}
+
+function closeWin() {
+  document.getElementById("winModal").className = "win-modal";
+  initPuzzle();
+  shufflePuzzle();
+}
+
+function solvePuzzle() {
+  tiles = Array.from({ length: N * N - 1 }, (_, i) => i + 1);
+  tiles.push(0);
+  emptyIdx = N * N - 1;
+  clearInterval(timerInterval);
+  renderBoard();
+}
+
+function loadImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    imgSrc = ev.target.result;
+    document.querySelector(".upload-area p").textContent = "✅ Foto berhasil diupload!";
+    shufflePuzzle();
+  };
+  reader.readAsDataURL(file);
+}
+
+initPuzzle();
+shufflePuzzle();
+</script>
+</body>
+</html>
